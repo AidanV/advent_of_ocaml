@@ -8,9 +8,9 @@ let read_lines file =
 let rec get_first_elf ls = 
   match ls with
   | [] -> [], []
-  | x::ns when x = "" -> [], ns
-  | x::ns -> 
-      let nums, rest = get_first_elf ns in
+  | x::ls when x = "" -> [], ls
+  | x::ls -> 
+      let nums, rest = get_first_elf ls in
       (int_of_string x)::nums, rest
 
 let rec get_elves ls = 
@@ -24,7 +24,10 @@ let () =
   read_lines file |> 
   get_elves |> 
   List.map (List.fold_left (+) 0) |> 
-  List.fold_left max 0 |> 
+  List.sort compare |>
+  List.rev |>
+  List.mapi (fun i a -> if i < 3 then a else 0) |>
+  List.fold_left (+) 0 |>
   string_of_int |> 
   print_endline
   
