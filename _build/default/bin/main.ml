@@ -1,25 +1,3 @@
-(*
-Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
-Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
-Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
-Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
-Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
-Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
-
-make string out of left side
-
-split right side into the individual values
-
-filter right list if it is contained in the left string
-
-map all cards to 2^(length-1)
-
-sum
-
-*)
-
-
-
 let read_lines file =
   let contents = In_channel.with_open_bin file In_channel.input_all in
   String.split_on_char '\n' contents
@@ -29,11 +7,41 @@ let contains s1 s2 =
     try ignore (Str.search_forward re s1 0); true
     with Not_found -> false
 
-let rec pow base exponent = 
-  match exponent with
-  | 0 -> 1
-  | 1 -> base
-  | _ -> base * pow base (exponent - 1)
+(*let print_arr arr = 
+  print_string "[ ";
+  Array.iter (fun v -> 
+  match v with
+  | Some v -> print_string ((string_of_int v) ^ "; ")
+  | None -> print_string "N/A; ") arr;
+  print_endline "]"*)
+
+let calculate_wins left right = 
+  right
+  |> String.split_on_char ' '
+  |> List.filter ((<>) "")
+  |> List.filter (fun s -> contains (left) s) 
+
+let memoize = Array.make 300 (None);; 
+
+let rec get_total all_wins n =
+  match Array.get memoize n with
+  | Some (x) -> x
+  | None ->
+    
+  let num_wins = 
+    match List.nth_opt all_wins n with
+    | Some x -> List.length x
+    | None -> 0
+  in
+
+  let vals = 
+    List.init (num_wins) 
+    (fun i -> get_total all_wins (i + n + 1)) 
+  in
+
+  let ret = List.fold_left (+) (1) vals in
+  Array.set memoize n (Some ret);
+  ret
 
 let () = 
   let lines = read_lines "input.dat" |> List.filter ((<>) "") in 
@@ -44,13 +52,19 @@ let () =
   in
   let lefts = List.map (fun v -> List.nth v 0) lefts_and_rights in 
   let rights = List.map (fun v -> List.nth v 1) lefts_and_rights in
-  rights 
-  |> List.map (String.split_on_char ' ')
-  |> List.map (List.filter ((<>) ""))
-  |> List.mapi (fun card_num right -> List.filter (fun s -> contains (List.nth lefts card_num) s) right)
-  |> List.map (List.length)
-  |> List.filter (fun i -> i > 0)
-  |> List.map (fun len -> pow 2 (len - 1))
-  |> List.fold_left (+) 0
+  let wins = 
+    rights 
+    |> List.mapi (fun card_num right -> calculate_wins (List.nth lefts card_num) right)
+  in
+
+  rights
+  |> List.mapi (fun i _ -> get_total wins i)
+  |> List.fold_left (+) (0)
   |> string_of_int
   |> print_endline
+
+(*
+
+lefts rights
+
+*)

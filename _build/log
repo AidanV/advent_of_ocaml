@@ -3,7 +3,7 @@
 # Shared cache: disabled
 # Workspace root: /home/aidan/Projects/aoc
 # Auto-detected concurrency: 12
-$ /nix/store/bbzhlmmwpy8zqcyw2a26wgp6qayanvyq-ocaml-4.14.1/bin/ocamlc.opt -config > /run/user/1000/dune_a3cccc_output
+$ /nix/store/bbzhlmmwpy8zqcyw2a26wgp6qayanvyq-ocaml-4.14.1/bin/ocamlc.opt -config > /run/user/1000/dune_ec81a8_output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
