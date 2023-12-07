@@ -8,15 +8,16 @@ let find_roots (max_time: float) (distance: float) =
 ;;
 
 let () = 
-
+  
   let ls = read_lines "input.dat" 
   |> List.filter ((<>) "")
+    
+  |> List.map (fun s -> String.to_seq s |> Seq.filter ((!=) ' ') |> String.of_seq)
   |> List.map (String.split_on_char ':')
   |> List.map (fun ls -> List.nth ls 1)
   |> List.map (String.split_on_char ' ')
   |> List.map (List.filter ((<>) "")) 
   |> List.map (List.map(float_of_string)) in
-  print_int (List.length ls);
   let pairs = List.combine (List.nth ls 0) (List.nth ls 1) in
     
   List.fold_left (fun acc (max_time, distance) ->
