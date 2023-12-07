@@ -4,7 +4,7 @@ let count_c_in_s (s: string) (c: char) =
   |> Seq.fold_left (fun acc v -> if v = c then acc + 1 else acc) 0 
 ;;
 
-type hand = Five of string | Four of string | House of string | Three of string | Two of string | High of string | Error;;
+type hand = Five of string | Four of string | House of string | Three of string | Two of string | One of string | High of string | Error;;
 
 module Chars = Set.Make(Char)
 
@@ -27,7 +27,7 @@ let get_hand_type (s: string) =
       Two s
     else
       Three s
-  | 4 -> Two s
+  | 4 -> One s
   | 5 -> High s
   | _ -> Error
   (*
@@ -86,17 +86,22 @@ let compare_hands (hand1: hand) (hand2: hand) =
     )
   | Three s1 -> (
       match hand2 with
-      | Two _ | High _ -> 1
+      | Two _ | One _ | High _ -> 1
       | Three s2 -> compare_strings s1 s2
       | _ -> -1
     )
   | Two s1 -> (
       match hand2 with
-      | High _ -> 1
+      | One _ | High _ -> 1
       | Two s2 -> compare_strings s1 s2
       | _ -> -1
     )
-    
+  | One s1 -> (
+      match hand2 with
+      | High _ -> 1
+      | One s2 -> compare_strings s1 s2
+      | _ -> -1
+    )    
   | High s1 -> (
       match hand2 with
       | High s2 -> compare_strings s1 s2
