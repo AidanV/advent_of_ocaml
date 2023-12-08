@@ -12,23 +12,33 @@ let get_hand_type (s: string) =
   let char_set = Chars.of_seq (String.to_seq s) in
   let unique_chars = Chars.elements char_set in
   let length = List.length unique_chars in
-  match length with
+  let num_J = count_c_in_s s 'J' in
+  let has_J = num_J > 0 in
+  match length with (* length is unique char - 1  AAJJJ  AAJJ9  AAAAA  AJA19    JJJJJ*)
   | 1 -> Five s
   | 2 -> (
-    match count_c_in_s s (List.nth unique_chars 0) with
-    | 1 | 4 -> Four s
-    | 2 | 3 -> House s
-    | _ -> Error
+      if has_J then Five s
+      else (
+        match count_c_in_s s (List.nth unique_chars 0) with
+        | 1 | 4 -> Four s
+        | 2 | 3 -> House s
+        | _ -> Error
+      )
     )
   | 3 -> 
     if count_c_in_s s (List.nth unique_chars 0) = 2 || 
        count_c_in_s s (List.nth unique_chars 1) = 2 
     then
-      Two s
+      match num_J with
+      | 0 -> Two s
+      | 1 -> House s
+      | 2 -> Four s
+      | _ -> Error
     else
-      Three s
-  | 4 -> One s
-  | 5 -> High s
+      if has_J then Four s else Three s
+    
+  | 4 -> if has_J then Three s else One s
+  | 5 -> if has_J then One s else High s
   | _ -> Error
   (*
   if cset length 1 -> Five
@@ -51,16 +61,16 @@ let compare_strings (s1: string) (s2: string) =
   Hashtbl.add card_hash 'A' 12;
   Hashtbl.add card_hash 'K' 11;
   Hashtbl.add card_hash 'Q' 10;
-  Hashtbl.add card_hash 'J' 9;
-  Hashtbl.add card_hash 'T' 8;
-  Hashtbl.add card_hash '9' 7;
-  Hashtbl.add card_hash '8' 6;
-  Hashtbl.add card_hash '7' 5;
-  Hashtbl.add card_hash '6' 4;
-  Hashtbl.add card_hash '5' 3;
-  Hashtbl.add card_hash '4' 2;
-  Hashtbl.add card_hash '3' 1;
-  Hashtbl.add card_hash '2' 0;
+  Hashtbl.add card_hash 'T' 9;
+  Hashtbl.add card_hash '9' 8;
+  Hashtbl.add card_hash '8' 7;
+  Hashtbl.add card_hash '7' 6;
+  Hashtbl.add card_hash '6' 5;
+  Hashtbl.add card_hash '5' 4;
+  Hashtbl.add card_hash '4' 3;
+  Hashtbl.add card_hash '3' 2;
+  Hashtbl.add card_hash '2' 1;
+  Hashtbl.add card_hash 'J' 0;
   List.compare (fun a1 a2 -> Hashtbl.find card_hash a1 - Hashtbl.find card_hash a2) (List.of_seq (String.to_seq s1)) (List.of_seq (String.to_seq s2))
 ;;
 
